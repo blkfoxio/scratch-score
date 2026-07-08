@@ -1,0 +1,32 @@
+# Xcode / build artifacts
+*.xcodeproj
+*.xcworkspace
+!default.xcworkspace
+DerivedData/
+.build/
+build/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# XcodeGen generates the project; keep project.yml, not the output
+ScratchScore.xcodeproj/
+
+# Secrets (never commit real keys)
+**/Secrets.xcconfig
+!**/Secrets.example.xcconfig
+
+# Supabase local
+supabase/.branches
+supabase/.temp
+supabase/.env
+
+# macOS
+.DS_Store
+
+# SPM
+Package.resolved
+.swiftpm/
+
+# Node (Edge Functions tooling, if any)
+node_modules/

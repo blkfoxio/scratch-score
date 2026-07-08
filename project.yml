@@ -1,0 +1,71 @@
+name: ScratchScore
+
+options:
+  bundleIdPrefix: com.cyflare.scratchscore
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    GENERATE_INFOPLIST_FILE: NO
+
+packages:
+  Supabase:
+    url: https://github.com/supabase/supabase-swift
+    from: 2.5.0
+
+targets:
+  ScratchScore:
+    type: application
+    platform: iOS
+    configFiles:
+      Debug: ScratchScore/App/Secrets.xcconfig
+      Release: ScratchScore/App/Secrets.xcconfig
+    sources:
+      - path: ScratchScore
+        excludes:
+          - "**/*.xcconfig"
+    dependencies:
+      - package: Supabase
+        product: Supabase
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.cyflare.scratchscore
+        INFOPLIST_FILE: ScratchScore/Supporting/Info.plist
+        CODE_SIGN_ENTITLEMENTS: ScratchScore/Supporting/ScratchScore.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        TARGETED_DEVICE_FAMILY: "1"
+        SUPPORTS_MACCATALYST: NO
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+        ENABLE_PREVIEWS: YES
+
+  ScratchScoreTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - ScratchScoreTests
+    dependencies:
+      - target: ScratchScore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.cyflare.scratchscore.tests
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  ScratchScore:
+    build:
+      targets:
+        ScratchScore: all
+        ScratchScoreTests: [test]
+    test:
+      targets:
+        - ScratchScoreTests
