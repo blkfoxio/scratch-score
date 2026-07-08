@@ -14,20 +14,26 @@
 // Deploy: supabase functions deploy delete-account
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { create, getNumericDate } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
+import { revokeAppleToken } from "../_shared/apple.ts";
+
+const cors = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...cors, "Content-Type": "application/json" },
+  });
+}
 
 Deno.serve(async (req) => {
-  const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  };
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
   try {
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return json({ error: "Missing Authorization header" }, 401, corsHeaders);
-    }
+    if (!authHeader) return json({ error: "Missing Authorization header" }, 401);
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -37,9 +43,7 @@ Deno.serve(async (req) => {
       global: { headers: { Authorization: authHeader } },
     });
     const { data: userData, error: userErr } = await userClient.auth.getUser();
-    if (userErr || !userData.user) {
-      return json({ error: "Invalid session" }, 401, corsHeaders);
-    }
+    if (userErr || !userData.user) return json({ error: "Invalid session" }, 401);
     const user = userData.user;
 
     // Admin client (service role) for privileged operations.
@@ -62,70 +66,11 @@ Deno.serve(async (req) => {
 
     // 2) Delete the auth user — cascades all app data through FK constraints.
     const { error: deleteErr } = await admin.auth.admin.deleteUser(user.id);
-    if (deleteErr) {
-      return json({ error: `Delete failed: ${deleteErr.message}` }, 500, corsHeaders);
-    }
+    if (deleteErr) return json({ error: `Delete failed: ${deleteErr.message}` }, 500);
 
-    return json({ success: true }, 200, corsHeaders);
+    return json({ success: true });
   } catch (e) {
     console.error(e);
-    return json({ error: String(e) }, 500, corsHeaders);
+    return json({ error: String(e) }, 500);
   }
 });
-
-function json(body: unknown, status: number, headers: Record<string, string>) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...headers, "Content-Type": "application/json" },
-  });
-}
-
-/// Builds the Apple client secret (a short-lived ES256 JWT signed with the .p8 key)
-/// and calls Apple's token revocation endpoint.
-async function revokeAppleToken(refreshToken: string) {
-  const teamId = Deno.env.get("APPLE_TEAM_ID")!;
-  const clientId = Deno.env.get("APPLE_CLIENT_ID")!;
-  const keyId = Deno.env.get("APPLE_KEY_ID")!;
-  const privateKeyPem = Deno.env.get("APPLE_PRIVATE_KEY")!;
-
-  const clientSecret = await create(
-    { alg: "ES256", kid: keyId, typ: "JWT" },
-    {
-      iss: teamId,
-      iat: getNumericDate(0),
-      exp: getNumericDate(60 * 5),
-      aud: "https://appleid.apple.com",
-      sub: clientId,
-    },
-    await importApplePrivateKey(privateKeyPem),
-  );
-
-  const body = new URLSearchParams({
-    client_id: clientId,
-    client_secret: clientSecret,
-    token: refreshToken,
-    token_type_hint: "refresh_token",
-  });
-
-  const res = await fetch("https://appleid.apple.com/auth/revoke", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body,
-  });
-  if (!res.ok) throw new Error(`Apple revoke HTTP ${res.status}: ${await res.text()}`);
-}
-
-async function importApplePrivateKey(pem: string): Promise<CryptoKey> {
-  const cleaned = pem
-    .replace(/-----BEGIN PRIVATE KEY-----/, "")
-    .replace(/-----END PRIVATE KEY-----/, "")
-    .replace(/\s+/g, "");
-  const der = Uint8Array.from(atob(cleaned), (c) => c.charCodeAt(0));
-  return await crypto.subtle.importKey(
-    "pkcs8",
-    der,
-    { name: "ECDSA", namedCurve: "P-256" },
-    false,
-    ["sign"],
-  );
-}

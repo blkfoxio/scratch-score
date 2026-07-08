@@ -114,20 +114,37 @@ final class AuthManager {
             return
         }
 
-        // Full name is only present on the first authorization — capture it now.
+        // These are only present on the FIRST authorization — capture them now.
         let fullName = [credential.fullName?.givenName, credential.fullName?.familyName]
             .compactMap { $0 }
             .joined(separator: " ")
+        let authCode = credential.authorizationCode.flatMap { String(data: $0, encoding: .utf8) }
 
-        await run {
-            try await self.supabase.auth.signInWithIdToken(
+        isWorking = true
+        lastErrorMessage = nil
+        defer { isWorking = false }
+        do {
+            let session = try await supabase.auth.signInWithIdToken(
                 credentials: .init(provider: .apple, idToken: idToken, nonce: nonce)
             )
             if !fullName.isEmpty {
-                _ = try? await self.supabase.auth.update(
+                _ = try? await supabase.auth.update(
                     user: UserAttributes(data: ["full_name": .string(fullName)])
                 )
             }
+            // Register the Apple refresh token server-side so account deletion can
+            // revoke it later (App Store requirement). Best-effort — never blocks sign-in.
+            if let authCode {
+                _ = try? await supabase.functions.invoke(
+                    "apple-register-token",
+                    options: FunctionInvokeOptions(
+                        headers: ["Authorization": "Bearer \(session.accessToken)"],
+                        body: ["authorization_code": authCode]
+                    )
+                )
+            }
+        } catch {
+            lastErrorMessage = error.localizedDescription
         }
         rawAppleNonce = nil
     }
