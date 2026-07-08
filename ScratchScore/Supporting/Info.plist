@@ -30,6 +30,8 @@
 	<string>$(SUPABASE_ANON_KEY)</string>
 	<key>OAuthCallbackScheme</key>
 	<string>$(OAUTH_CALLBACK_SCHEME)</string>
+	<key>GolfCourseAPIKey</key>
+	<string>$(GOLF_COURSE_API_KEY)</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

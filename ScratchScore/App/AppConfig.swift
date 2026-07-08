@@ -36,6 +36,17 @@ enum AppConfig {
         URL(string: "\(oauthCallbackScheme)://login-callback")!
     }
 
+    /// golfcourseapi.com key for online course search/import. Optional — the feature
+    /// hides itself when this is unset.
+    static var golfCourseAPIKey: String {
+        infoString("GolfCourseAPIKey") ?? ""
+    }
+
+    static var isCourseAPIConfigured: Bool {
+        let key = golfCourseAPIKey
+        return !key.isEmpty && key != "$(GOLF_COURSE_API_KEY)"
+    }
+
     /// `true` when the app has real Supabase secrets (not the committed placeholders).
     static var isBackendConfigured: Bool {
         guard let raw = infoString("SupabaseURL"), let key = infoString("SupabaseAnonKey") else {

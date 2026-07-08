@@ -41,6 +41,12 @@ extension DataStore {
         save()
     }
 
+    func setPar(_ value: Int, hole: HoleModel) {
+        hole.par = value
+        hole.markDirty()
+        save()
+    }
+
     func setYardage(_ value: Int?, hole: Int, teeSet: TeeSetModel, userId: UUID?) {
         if let existing = teeSet.yardages.first(where: { $0.holeNumber == hole && !$0.isTombstoned }) {
             existing.yardage = value

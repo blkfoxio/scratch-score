@@ -8,6 +8,9 @@ struct CourseListView: View {
     private var courses: [CourseModel]
 
     @State private var showingNew = false
+    @State private var showingSearch = false
+
+    private var isSearchAvailable: Bool { AppConfig.isCourseAPIConfigured }
 
     var body: some View {
         NavigationStack {
@@ -16,9 +19,11 @@ struct CourseListView: View {
                     EmptyStateView(
                         systemImage: "flag.fill",
                         title: "No courses",
-                        message: "Add a course with per-hole par, stroke index, and tee yardages.",
-                        actionTitle: "Add Course",
-                        action: { showingNew = true }
+                        message: isSearchAvailable
+                            ? "Search for a course to download it, or add one manually."
+                            : "Add a course with per-hole par, stroke index, and tee yardages.",
+                        actionTitle: isSearchAvailable ? "Find a Course" : "Add Course",
+                        action: { if isSearchAvailable { showingSearch = true } else { showingNew = true } }
                     )
                 } else {
                     List {
@@ -39,7 +44,14 @@ struct CourseListView: View {
             .navigationTitle("Courses")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button { showingNew = true } label: { Image(systemName: "plus") }
+                    Menu {
+                        if isSearchAvailable {
+                            Button { showingSearch = true } label: { Label("Find a course", systemImage: "magnifyingglass") }
+                        }
+                        Button { showingNew = true } label: { Label("Add manually", systemImage: "square.and.pencil") }
+                    } label: {
+                        Image(systemName: "plus")
+                    }
                 }
             }
             .navigationDestination(for: UUID.self) { id in
@@ -49,6 +61,9 @@ struct CourseListView: View {
             }
             .sheet(isPresented: $showingNew) {
                 NewCourseSheet()
+            }
+            .sheet(isPresented: $showingSearch) {
+                CourseSearchView()
             }
         }
     }

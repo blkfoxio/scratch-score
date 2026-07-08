@@ -18,16 +18,19 @@ struct HoleEntryView: View {
                 Card {
                     VStack(spacing: 18) {
                         ScoreStepper(
-                            title: "To scoring zone (A)",
+                            title: "Strokes to scratch zone",
                             systemImage: "scope",
                             value: bindingA,
                             range: 0...12,
                             valueTint: { _ in .primary },
                             onChange: {}
                         )
+                        Text("Tee to within 100 yds of the green")
+                            .font(.caption2).foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         Divider()
                         ScoreStepper(
-                            title: "In scoring zone (B)",
+                            title: "Strokes in scratch zone",
                             systemImage: "flag.fill",
                             value: bindingB,
                             range: 0...12,
@@ -39,14 +42,14 @@ struct HoleEntryView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                         Divider()
                         ScoreStepper(
-                            title: "Putts (D)",
+                            title: "# of putts",
                             systemImage: "circle.circle",
                             value: bindingPutts,
                             range: 0...8,
                             defaultOnFirstTap: 1,
                             onChange: {}
                         )
-                        Text("Putts are part of Row B — shown for stats, not added again.")
+                        Text("Putts are part of strokes in scoring zone — shown for stats, not added again.")
                             .font(.caption2).foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
@@ -62,7 +65,7 @@ struct HoleEntryView: View {
 
     private var totalBadge: some View {
         VStack(spacing: 4) {
-            Text("TOTAL (A + B)").font(.caption2.weight(.semibold)).foregroundStyle(.secondary)
+            Text("TOTAL STROKES").font(.caption2.weight(.semibold)).foregroundStyle(.secondary)
             Text(score.total.map(String.init) ?? "–")
                 .font(.system(size: 64, weight: .bold, design: .rounded))
                 .monospacedDigit()

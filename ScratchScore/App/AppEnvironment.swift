@@ -12,6 +12,7 @@ final class AppEnvironment {
     let auth: AuthManager
     let dataStore: DataStore
     let sync: SyncEngine
+    let golfAPI = GolfCourseAPI()
 
     init(inMemory: Bool = false) {
         self.isBackendConfigured = AppConfig.isBackendConfigured

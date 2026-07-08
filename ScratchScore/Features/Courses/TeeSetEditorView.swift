@@ -26,11 +26,20 @@ struct TeeSetEditorView: View {
                 }
             }
 
-            Section("Yardages") {
+            Section {
                 ForEach(course.activeHoles) { hole in
-                    HStack {
-                        Text("Hole \(hole.holeNumber)").frame(width: 70, alignment: .leading)
-                        Text("Par \(hole.par)").font(.caption).foregroundStyle(.secondary)
+                    HStack(spacing: 12) {
+                        Text("Hole \(hole.holeNumber)").frame(width: 62, alignment: .leading)
+                        Menu {
+                            Picker("Par", selection: parBinding(hole)) {
+                                ForEach(3...6, id: \.self) { Text("Par \($0)").tag($0) }
+                            }
+                        } label: {
+                            Text("Par \(hole.par)")
+                                .font(.caption.weight(.medium))
+                                .foregroundStyle(.ssFairway)
+                                .frame(width: 52)
+                        }
                         Spacer()
                         TextField("yds", value: yardageBinding(hole.holeNumber), format: .number)
                             .keyboardType(.numberPad).multilineTextAlignment(.trailing).frame(width: 70)
@@ -38,8 +47,12 @@ struct TeeSetEditorView: View {
                     }
                 }
                 if let total = teeSet.totalYardage {
-                    LabeledContent("Total", value: "\(total) yds").font(.subheadline.weight(.semibold))
+                    LabeledContent("Total yardage", value: "\(total) yds").font(.subheadline.weight(.semibold))
                 }
+            } header: {
+                Text("Par & Yardage")
+            } footer: {
+                Text("Tap “Par” to change it. Par is shared across all tees; yardage is per tee.")
             }
         }
         .navigationTitle(teeSet.name)
@@ -53,6 +66,13 @@ struct TeeSetEditorView: View {
         Binding(
             get: { teeSet.yardage(forHole: hole) },
             set: { env.dataStore.setYardage($0, hole: hole, teeSet: teeSet, userId: env.auth.currentUserId) }
+        )
+    }
+
+    private func parBinding(_ hole: HoleModel) -> Binding<Int> {
+        Binding(
+            get: { hole.par },
+            set: { env.dataStore.setPar($0, hole: hole) }
         )
     }
 }
