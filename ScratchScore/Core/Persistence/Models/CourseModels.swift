@@ -55,8 +55,15 @@ final class CourseModel: Syncable {
         holes.filter { !$0.isTombstoned }.sorted { $0.holeNumber < $1.holeNumber }
     }
 
+    /// Tees ordered by total yardage, longest first (the standard scorecard order).
+    /// Tees without a recorded yardage fall to the end, tie-broken by name.
     var activeTeeSets: [TeeSetModel] {
-        teeSets.filter { !$0.isTombstoned }.sorted { $0.name < $1.name }
+        teeSets.filter { !$0.isTombstoned }.sorted { a, b in
+            let ay = a.totalYardage ?? Int.min
+            let by = b.totalYardage ?? Int.min
+            if ay != by { return ay > by }
+            return a.name < b.name
+        }
     }
 
     var totalPar: Int { activeHoles.reduce(0) { $0 + $1.par } }
