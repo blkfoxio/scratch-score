@@ -43,15 +43,15 @@ Set the Edge Function secrets (never shipped in the app):
 ```bash
 supabase secrets set \
   APPLE_TEAM_ID=XXXXXXXXXX \
-  APPLE_CLIENT_ID=com.cyflare.scratchscore \
+  APPLE_CLIENT_ID=app.scratchscore \
   APPLE_KEY_ID=XXXXXXXXXX \
   APPLE_PRIVATE_KEY="$(cat AuthKey_XXXXXXXXXX.p8)"
 ```
 
 In the Supabase dashboard → **Authentication → Providers**:
-- **Apple**: enable; add the app **Bundle ID** (`com.cyflare.scratchscore`) to authorized client IDs.
+- **Apple**: enable; add the app **Bundle ID** (`app.scratchscore`) to authorized client IDs.
 - **Google**: enable with a Google Cloud **Web** OAuth client id/secret.
-- **URL Configuration → Redirect URLs**: add `com.cyflare.scratchscore://login-callback`.
+- **URL Configuration → Redirect URLs**: add `app.scratchscore://login-callback`.
 
 ### 2. App secrets
 

@@ -27,7 +27,7 @@ enum AppConfig {
 
     /// Custom URL scheme used for the Google OAuth redirect callback.
     static var oauthCallbackScheme: String {
-        infoString("OAuthCallbackScheme") ?? "com.cyflare.scratchscore"
+        infoString("OAuthCallbackScheme") ?? "app.scratchscore"
     }
 
     /// The redirect URL Supabase sends the OAuth callback to. Must be allow-listed

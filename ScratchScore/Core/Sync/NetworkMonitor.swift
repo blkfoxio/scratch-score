@@ -9,7 +9,7 @@ import Observation
 final class NetworkMonitor {
     private(set) var isOnline: Bool = true
     private let monitor = NWPathMonitor()
-    private let queue = DispatchQueue(label: "com.cyflare.scratchscore.network")
+    private let queue = DispatchQueue(label: "app.scratchscore.network")
 
     /// Called on the main actor each time connectivity transitions to online.
     var onBecameOnline: (() -> Void)?
