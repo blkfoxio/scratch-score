@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — Scratch Score</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+         max-width: 720px; margin: 0 auto; padding: 48px 20px; line-height: 1.6;
+         color: #1a1a1a; background: #fff; }
+  @media (prefers-color-scheme: dark) { body { color: #e6e6e6; background: #121512; } a { color: #4fbf6f; } }
+  h1 { font-size: 1.8rem; } h2 { font-size: 1.2rem; margin-top: 1.6em; }
+  a { color: #34a86a; } .muted { color: #888; font-size: .9rem; }
+</style>
+</head>
+<body>
+  <h1>Privacy Policy</h1>
+  <p class="muted">Last updated: July 8, 2026</p>
+
+  <p>Scratch Score (“the app”, “we”) helps golfers track rounds using the scoring-zone method. This policy explains what we collect and why.</p>
+
+  <h2>Information we collect</h2>
+  <ul>
+    <li><strong>Account information:</strong> your email address, and (if you use Sign in with Apple) your name. Used to create and secure your account.</li>
+    <li><strong>Your golf data:</strong> courses, tee sets, rounds, hole scores, putts, and related statistics you enter. Stored to provide the app’s core functionality and to sync across your devices.</li>
+  </ul>
+  <p>We do <strong>not</strong> collect location, contacts, health data, or advertising identifiers. We do <strong>not</strong> use tracking, and we do <strong>not</strong> sell your data.</p>
+
+  <h2>How your data is stored</h2>
+  <p>Your data is stored in our backend (Supabase / PostgreSQL) and cached on your device for offline use. Row-level security ensures your data is accessible only to your authenticated account.</p>
+
+  <h2>Third-party services</h2>
+  <ul>
+    <li><strong>Supabase</strong> — authentication, database, and sync infrastructure.</li>
+    <li><strong>Sign in with Apple</strong> and <strong>Google Sign-In</strong> — optional authentication providers you choose.</li>
+    <li><strong>GolfCourseAPI</strong> — used to look up public course scorecard data when you search for a course.</li>
+  </ul>
+  <p>These providers process the relevant data according to their own privacy policies.</p>
+
+  <h2>Account deletion</h2>
+  <p>You can permanently delete your account at any time from <strong>Settings → Delete Account</strong> inside the app. Deletion removes your account and all associated golf data from our servers and revokes any Sign in with Apple tokens. This action cannot be undone.</p>
+
+  <h2>Data retention</h2>
+  <p>We retain your data until you delete your account, after which it is removed from our production systems.</p>
+
+  <h2>Children</h2>
+  <p>Scratch Score is not directed to children under 13, and we do not knowingly collect data from them.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about this policy: <a href="mailto:privacy@scratchscore.app">privacy@scratchscore.app</a></p>
+</body>
+</html>

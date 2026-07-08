@@ -170,7 +170,7 @@ struct SignInView: View {
 }
 
 enum LegalLinks {
-    static let privacy = URL(string: "https://scratchscore.app/privacy")!
-    static let terms = URL(string: "https://scratchscore.app/terms")!
-    static let support = URL(string: "https://scratchscore.app/support")!
+    static let privacy = URL(string: "https://blkfoxio.github.io/scratch-score/privacy.html")!
+    static let terms = URL(string: "https://blkfoxio.github.io/scratch-score/terms.html")!
+    static let support = URL(string: "https://blkfoxio.github.io/scratch-score/support.html")!
 }
