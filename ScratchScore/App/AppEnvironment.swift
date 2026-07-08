@@ -12,7 +12,7 @@ final class AppEnvironment {
     let auth: AuthManager
     let dataStore: DataStore
     let sync: SyncEngine
-    let golfAPI = GolfCourseAPI()
+    let golfAPI: GolfCourseAPI
 
     init(inMemory: Bool = false) {
         self.isBackendConfigured = AppConfig.isBackendConfigured
@@ -22,6 +22,7 @@ final class AppEnvironment {
         let client = SupabaseClientProvider.make()
         self.supabase = client
         self.auth = AuthManager(supabase: client)
+        self.golfAPI = GolfCourseAPI(supabase: client)
 
         let store = DataStore(context: container.mainContext)
         self.dataStore = store

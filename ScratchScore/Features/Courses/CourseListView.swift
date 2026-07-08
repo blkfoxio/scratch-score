@@ -10,7 +10,7 @@ struct CourseListView: View {
     @State private var showingNew = false
     @State private var showingSearch = false
 
-    private var isSearchAvailable: Bool { AppConfig.isCourseAPIConfigured }
+    private var isSearchAvailable: Bool { AppConfig.isBackendConfigured }
 
     var body: some View {
         NavigationStack {

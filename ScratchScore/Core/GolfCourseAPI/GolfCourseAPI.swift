@@ -1,53 +1,49 @@
 import Foundation
+import Supabase
 
-/// Client for golfcourseapi.com. The search endpoint returns full course objects
-/// (including per-tee, per-hole par/yardage/handicap), so one call gives everything
-/// we need to import — no separate detail request, which conserves the free quota.
-///
-/// Auth header format (per the provider): `Authorization: Key <API_KEY>`.
+/// Course search via golfcourseapi.com, proxied through the `course-search` Supabase
+/// Edge Function so the provider API key stays server-side and is never shipped in the
+/// app. The function requires an authenticated user and returns the provider's JSON
+/// (full course objects incl. per-tee, per-hole par/yardage/handicap) verbatim.
 struct GolfCourseAPI {
     enum APIError: LocalizedError {
         case notConfigured
-        case http(Int)
-        case decoding(String)
+        case failed(String)
 
         var errorDescription: String? {
             switch self {
-            case .notConfigured: return "Golf Course API key is not set."
-            case let .http(code): return "Course search failed (HTTP \(code))."
-            case let .decoding(msg): return "Couldn't read the course data. \(msg)"
+            case .notConfigured: return "Course search isn't available right now."
+            case let .failed(message): return message
             }
         }
     }
 
-    private let base = URL(string: "https://api.golfcourseapi.com/v1")!
-    private let session: URLSession = .shared
+    private let supabase: SupabaseClient
 
-    var isConfigured: Bool { AppConfig.isCourseAPIConfigured }
+    init(supabase: SupabaseClient) {
+        self.supabase = supabase
+    }
+
+    /// Available whenever the backend is configured — the key lives in the Edge
+    /// Function, so every signed-in user can search without supplying their own.
+    var isConfigured: Bool { AppConfig.isBackendConfigured }
 
     func search(_ query: String) async throws -> [APICourse] {
         guard isConfigured else { throw APIError.notConfigured }
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return [] }
 
-        var components = URLComponents(url: base.appendingPathComponent("search"), resolvingAgainstBaseURL: false)!
-        components.queryItems = [URLQueryItem(name: "search_query", value: trimmed)]
-
-        var request = URLRequest(url: components.url!)
-        request.setValue("Key \(AppConfig.golfCourseAPIKey)", forHTTPHeaderField: "Authorization")
-        request.timeoutInterval = 20
-
-        let (data, response) = try await session.data(for: request)
-        if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
-            throw APIError.http(http.statusCode)
-        }
-
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         do {
-            return try decoder.decode(APISearchResponse.self, from: data).courses
+            let response: APISearchResponse = try await supabase.functions.invoke(
+                "course-search",
+                options: FunctionInvokeOptions(body: ["q": trimmed]),
+                decoder: decoder
+            )
+            return response.courses
         } catch {
-            throw APIError.decoding(error.localizedDescription)
+            throw APIError.failed(error.localizedDescription)
         }
     }
 }
