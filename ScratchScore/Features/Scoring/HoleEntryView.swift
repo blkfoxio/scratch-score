@@ -49,7 +49,7 @@ struct HoleEntryView: View {
                             defaultOnFirstTap: 1,
                             onChange: {}
                         )
-                        Text("Putts are part of strokes in scoring zone — shown for stats, not added again.")
+                        Text("Putts are part of strokes in scratch zone — shown for stats, not added again.")
                             .font(.caption2).foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }

@@ -76,7 +76,7 @@ struct RoundSummaryView: View {
     private var zoneStats: some View {
         Card {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Scoring Zone").font(.subheadline.weight(.semibold))
+                Text("Scratch Zone").font(.subheadline.weight(.semibold))
                 HStack {
                     StatChip(value: RoundStats.percent(stats.zoneEfficiency), label: "Down in 3", tint: .ssFairway)
                     Divider()
