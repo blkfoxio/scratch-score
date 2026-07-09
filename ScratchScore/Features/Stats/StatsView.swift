@@ -35,7 +35,7 @@ struct StatsView: View {
                         VStack(spacing: 16) {
                             averagesCard
                             trendCard(title: "Total score", tint: .ssFairway) { $0.stats.totalStrokes }
-                            trendCard(title: "Putts", tint: .blue) { $0.stats.totalPutts }
+                            trendCard(title: "Putts", tint: .ssSand) { $0.stats.totalPutts }
                             zoneTrendCard
                         }
                         .padding()

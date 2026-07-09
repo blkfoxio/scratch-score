@@ -83,7 +83,7 @@ struct RoundSummaryView: View {
                     StatChip(value: stats.avgShotsToZone.map { String(format: "%.1f", $0) } ?? "—", label: "Avg to zone")
                     Divider()
                     StatChip(value: stats.upDownAttempts > 0 ? "\(stats.upDownMade)/\(stats.upDownAttempts)" : "—",
-                             label: "Up & down")
+                             label: "Up & down", tint: .ssSand)
                 }
             }
         }
