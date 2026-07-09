@@ -100,4 +100,29 @@ final class DataStore {
         }
         save()
     }
+
+    /// Removes any locally-cached rows that belong to a *different* user. Guards against
+    /// cross-account contamination when switching accounts on the same device: without
+    /// this, pushing another user's rows fails Postgres RLS. Rows with no owner yet
+    /// (`userId == nil`) are treated as the current user's freshly-created data and kept.
+    func purgeForeignData(currentUserId: UUID) {
+        var changed = false
+        func purge<T: PersistentModel>(_ type: T.Type, isForeign: (T) -> Bool) {
+            let items = (try? context.fetch(FetchDescriptor<T>())) ?? []
+            for item in items where isForeign(item) {
+                context.delete(item)
+                changed = true
+            }
+        }
+        let foreign: (UUID?) -> Bool = { $0 != nil && $0 != currentUserId }
+        // Delete parents first; SwiftData cascade rules clean up their children.
+        purge(CourseModel.self) { foreign($0.userId) }
+        purge(RoundModel.self) { foreign($0.userId) }
+        purge(TeeSetModel.self) { foreign($0.userId) }
+        purge(HoleModel.self) { foreign($0.userId) }
+        purge(TeeHoleYardageModel.self) { foreign($0.userId) }
+        purge(HoleScoreModel.self) { foreign($0.userId) }
+        purge(ProfileModel.self) { $0.id != currentUserId }
+        if changed { save() }
+    }
 }

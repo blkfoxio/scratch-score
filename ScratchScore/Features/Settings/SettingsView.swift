@@ -44,7 +44,12 @@ struct SettingsView: View {
 
                 Section {
                     Button(role: .destructive) {
-                        Task { await env.auth.signOut() }
+                        Task {
+                            await env.auth.signOut()
+                            // Clear this account's cached data so the next sign-in starts clean.
+                            env.dataStore.wipeAll()
+                            SyncState(userId: userId).reset()
+                        }
                     } label: { Text("Sign Out") }
                 }
 
